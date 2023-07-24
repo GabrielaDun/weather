@@ -5,10 +5,12 @@ import { useCallback, useState } from 'react';
 
 const WeatherBox = () => {
 
-  const [weatherData, setWeatherData] = useState('London');
+  const [weatherData, setWeatherData] = useState('');
+  const [pending, setPending] = useState(false);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleCityChange = useCallback((city) => {
+    setPending(true);
     fetch(`http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=76efa90774fe579ae9d46234658f7612&units=metric`)
     .then(res => res.json())
       .then(data => {
@@ -20,6 +22,7 @@ const WeatherBox = () => {
           description: data.weather[0].main
         };
         setWeatherData(weatherData);
+        setPending(false);
 
    });
   });
@@ -27,8 +30,8 @@ const WeatherBox = () => {
   return (
     <section>
       <PickCity action={handleCityChange}/>
-      <WeatherSummary data={weatherData}/>
-      <Loader />
+      {weatherData && <WeatherSummary data={weatherData}/>}
+      {pending && <Loader />}
     </section>
   )
 };
